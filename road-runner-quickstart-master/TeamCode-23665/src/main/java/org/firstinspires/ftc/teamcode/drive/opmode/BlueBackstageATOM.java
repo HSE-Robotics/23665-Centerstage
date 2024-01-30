@@ -62,14 +62,14 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 @Autonomous(name = "Blue Back Stage", group = "Concept")
 
 public class BlueBackstageATOM extends LinearOpMode {
-    private DcMotor BR;
+    private DcMotor RR;
     private DcMotor FR;
     private DcMotor FL;
-    private DcMotor BL;
-    private DcMotor ArmMotor;
-    private CRServo RightServo;
-    private CRServo LeftServo;
-    private Servo ArmServo;
+    private DcMotor RL;
+    private DcMotor slider;
+    private DcMotor intake;
+    private Servo manita;
+    private Servo launcher;
     int Initial_Position;
     ElapsedTime timelapse;
     double ticks_per_revolution;
@@ -100,24 +100,25 @@ public class BlueBackstageATOM extends LinearOpMode {
     /**
      * The variable to store our instance of the vision portal.
      */
-    private VisionPortal visionPortal;
+    //private VisionPortal visionPortal;
 
     @Override
     public void runOpMode() {
 
-        initTfod();
+        //initTfod();
 
         int timeBack;
 
 
-        BR = hardwareMap.get(DcMotor.class, "BR");
+        RR = hardwareMap.get(DcMotor.class, "RR");
         FR = hardwareMap.get(DcMotor.class, "FR");
         FL = hardwareMap.get(DcMotor.class, "FL");
-        BL = hardwareMap.get(DcMotor.class, "BL");
-        ArmMotor = hardwareMap.get(DcMotor.class, "ArmMotor");
-        RightServo = hardwareMap.get(CRServo.class, "leftTire");
-        LeftServo = hardwareMap.get(CRServo.class, "rightTire");
-        ArmServo = hardwareMap.get(Servo.class, "Wrist");
+        RL = hardwareMap.get(DcMotor.class, "RL");
+        slider = hardwareMap.get(DcMotor.class, "slider");
+        manita = hardwareMap.get(Servo.class, "manita");
+        launcher = hardwareMap.get(Servo.class, "launcher");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -135,38 +136,22 @@ public class BlueBackstageATOM extends LinearOpMode {
             while (opModeIsActive()) {
 
 
-                initialPosition = ArmMotor.getCurrentPosition();
+                initialPosition = slider.getCurrentPosition();
 
-                ArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                ArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                ArmMotor.setDirection(DcMotor.Direction.REVERSE);
-                /*
-                BL.setDirection(DcMotor.Direction.REVERSE);
-                FL.setDirection(DcMotor.Direction.REVERSE);
-
-                // Using encoders to ensure driving is straight
-                BL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                BR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-                // Motors will brake on stopRobot function
-                BL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                BR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                FL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                FR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-                */
+                slider.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                slider.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slider.setDirection(DcMotor.Direction.REVERSE);
 
 
-                telemetryTfod();
+                //telemetryTfod();
                 // Push telemetry to the Driver Station.
                 telemetry.update();
 
                 // Save CPU resources; can resume streaming when needed.
-                if (gamepad1.dpad_down) {
-                    visionPortal.stopStreaming();
-                } else if (gamepad1.dpad_up) {
-                    visionPortal.resumeStreaming();
+        //        if (gamepad1.dpad_down) {
+          //          visionPortal.stopStreaming();
+            //    } else if (gamepad1.dpad_up) {
+              //      visionPortal.resumeStreaming();
                 }
 
                 // Share the CPU.
@@ -175,9 +160,9 @@ public class BlueBackstageATOM extends LinearOpMode {
         }
 
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
+       // visionPortal.close();
 
-    }   // end runOpMode()
+  //  }   // end runOpMode()
 
     /**
      * Initialize the TensorFlow Object Detection processor.
@@ -219,7 +204,7 @@ public class BlueBackstageATOM extends LinearOpMode {
         //builder.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableLiveView(true);
+        builder.enableLiveView(true);
 
         // Set the stream format; MJPEG uses less bandwidth than default YUY2.
         //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
@@ -233,10 +218,10 @@ public class BlueBackstageATOM extends LinearOpMode {
         builder.addProcessor(tfod);
 
         // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
+       // visionPortal = builder.build();
 
         // Set confidence threshold for TFOD recognitions, at any time.
-        tfod.setMinResultConfidence(0.75f);
+        // tfod.setMinResultConfidence(0.75f);
 
         // Disable or re-enable the TFOD processor at any time.
         //visionPortal.setProcessorEnabled(tfod, true);
@@ -270,10 +255,10 @@ public class BlueBackstageATOM extends LinearOpMode {
 
             startingX = 16;
             startingY = 64.00;
-            /*
+
             Pose2d startingPose = new Pose2d(startingX, startingY, initHeading);
             drive.setPoseEstimate(startingPose);
-            */
+
 
             telemetry.addData("", " ");
             telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
@@ -281,43 +266,42 @@ public class BlueBackstageATOM extends LinearOpMode {
             telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
             telemetry.addData("- PositionCube", "%s", cubePosition);
 
+            TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(10.06, 62.47, Math.toRadians(270.00)))
+                    .lineTo(new Vector2d(55.06, 62.50))
+                    .build();
+
 
             if((x > 200 && x < 310) && (y>100 && y < 220)){
                 int initPos;
                 objDetected = true;
-                initPos = ArmMotor.getCurrentPosition();
+                initPos = slider.getCurrentPosition();
                 cubePosition = "Center";
-                ArmMotor.setTargetPosition(initialPosition + 1163);
-                ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                ArmMotor.setPower(0.7);
+                slider.setTargetPosition(initialPosition + 1163);
+                slider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slider.setPower(0.7);
 
                 telemetry.addData("Target Position:", "%s", initialPosition + 150);
                 telemetry.update();
                 sleep(150);
 
-                TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(12.06, 62.47, Math.toRadians(270.00)))
-                        .lineTo(new Vector2d(12.06, 24.50))
+               TrajectorySequence untitled2 = drive.trajectorySequenceBuilder(new Pose2d(10.06, 62.47, Math.toRadians(270.00)))
+                        .lineTo(new Vector2d(55.06, 62.50))
                         .lineTo(new Vector2d(12.06, 45.00))
                         .lineToLinearHeading(new Pose2d(58.00, 25.00, Math.toRadians(0.00)))
                         .addDisplacementMarker(() -> {
                             // This marker runs after the first splineTo()
-                            ArmServo.setPosition(0.65);
-                            ArmMotor.setTargetPosition(initialPosition + 800);
-                            ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                            ArmMotor.setPower(0.7);
+                            manita.setPosition(0.65);
                             sleep(150);
                             // Run your action in here!
                         })
                         .lineToLinearHeading(new Pose2d(69.50, 26.00, Math.toRadians(270.00)))
                         .addDisplacementMarker(() -> {
                             // This marker runs after the first splineTo()
-                            RightServo.setPower(1.0);
-                            LeftServo.setPower(-1.0);
+
                             // Run your action in here!
                             sleep(500);
-                            RightServo.setPower(0.0);
-                            LeftServo.setPower(0.0);
-                            ArmServo.setPosition(1);
+
+                            launcher.setPosition(1);
                             sleep(150);
                         })
                         .lineTo(new Vector2d(36.47,25.00))
@@ -338,30 +322,144 @@ public class BlueBackstageATOM extends LinearOpMode {
                 TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(54.38, 30.00, Math.toRadians(0.00)))
                         .splineTo(new Vector2d(48.60, 59.15), Math.toRadians(92.94))
                         .splineToLinearHeading(new Pose2d(70.00, 63.37, Math.toRadians(180.00)), Math.toRadians(67.91))
-                        .build();
-                drive.setPoseEstimate(untitled1.start());
-                drive.followTrajectorySequence(untitled1);
+                        .build();*/
+                drive.setPoseEstimate(untitled2.start());
+                drive.followTrajectorySequence(untitled2);
 
                 TrajectorySequence seq1 = drive.trajectorySequenceBuilder(startingPose)
                         .lineTo(new Vector2d(16,30))
                         .lineTo(new Vector2d(16, 25))
                         .build();
                 drive.followTrajectorySequence(seq1);
-                */
+
 
                 break;
 
             }else if((x > 0 && x < 120) && (y>200 && y < 300)){
                 cubePosition = "Left";
-                ArmServo.setPosition(1.0);
+                int initPos;
+                objDetected = true;
+                initPos = slider.getCurrentPosition();
+                cubePosition = "Left";
+                slider.setTargetPosition(initialPosition + 1163);
+                slider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slider.setPower(0.7);
 
-                sleep(300);
-                //Drive to Left Position
+                telemetry.addData("Target Position:", "%s", initialPosition + 150);
+                telemetry.update();
+                sleep(150);
+
+                TrajectorySequence untitled2 = drive.trajectorySequenceBuilder(new Pose2d(10.06, 62.47, Math.toRadians(270.00)))
+                        .lineTo(new Vector2d(55.06, 62.50))
+                        /*.lineTo(new Vector2d(12.06, 45.00))
+                        .lineToLinearHeading(new Pose2d(58.00, 25.00, Math.toRadians(0.00)))
+                        .addDisplacementMarker(() -> {
+                            // This marker runs after the first splineTo()
+                            manita.setPosition(0.65);
+                            sleep(150);
+                            // Run your action in here!
+                        })
+                        .lineToLinearHeading(new Pose2d(69.50, 26.00, Math.toRadians(270.00)))
+                        .addDisplacementMarker(() -> {
+                            // This marker runs after the first splineTo()
+
+                            // Run your action in here!
+                            sleep(500);
+
+                            launcher.setPosition(1);
+                            sleep(150);
+                        })
+                        .lineTo(new Vector2d(36.47,25.00))
+                        .lineToLinearHeading(new Pose2d(36.47, 48.75, Math.toRadians(115.00)))
+                        .lineToLinearHeading(new Pose2d(63.46, 63.06, Math.toRadians(180.00)))*/
+                        .build();
+                drive.setPoseEstimate(untitled2.start());
+                drive.followTrajectorySequence(untitled2);
+                armDown(initialPosition);
+/*
+                RightServo.setPower(1.0);
+                LeftServo.setPower(-1.0);
+                sleep(2500);
+                ArmServo.setPosition(0.75);
+                RightServo.setPower(0.0);
+                LeftServo.setPower(0.0);
+
+                TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(54.38, 30.00, Math.toRadians(0.00)))
+                        .splineTo(new Vector2d(48.60, 59.15), Math.toRadians(92.94))
+                        .splineToLinearHeading(new Pose2d(70.00, 63.37, Math.toRadians(180.00)), Math.toRadians(67.91))
+                        .build();*/
+                drive.setPoseEstimate(untitled1.start());
+                drive.followTrajectorySequence(untitled1);
+
+                TrajectorySequence seq1 = drive.trajectorySequenceBuilder(startingPose)
+                        //.lineTo(new Vector2d(16,30))
+                        // .lineTo(new Vector2d(16, 25))
+                        .build();
+                drive.followTrajectorySequence(seq1);
+
 
                 break;
             }else if((x > 480 && x < 550) && (y>200 && y < 300)){
                 cubePosition = "Right";
-                ArmServo.setPosition(1.0);
+                int initPos;
+                objDetected = true;
+                initPos = slider.getCurrentPosition();
+                cubePosition = "Right";
+                slider.setTargetPosition(initialPosition + 1163);
+                slider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slider.setPower(0.7);
+
+                telemetry.addData("Target Position:", "%s", initialPosition + 150);
+                telemetry.update();
+                sleep(150);
+
+                TrajectorySequence untitled3 = drive.trajectorySequenceBuilder(new Pose2d(10.06, 62.47, Math.toRadians(270.00)))
+                        .lineTo(new Vector2d(55.06, 62.50))
+                        /*.lineTo(new Vector2d(12.06, 45.00))
+                        .lineToLinearHeading(new Pose2d(58.00, 25.00, Math.toRadians(0.00)))
+                        .addDisplacementMarker(() -> {
+                            // This marker runs after the first splineTo()
+                            manita.setPosition(0.65);
+                            sleep(150);
+                            // Run your action in here!
+                        })
+                        .lineToLinearHeading(new Pose2d(69.50, 26.00, Math.toRadians(270.00)))
+                        .addDisplacementMarker(() -> {
+                            // This marker runs after the first splineTo()
+
+                            // Run your action in here!
+                            sleep(500);
+
+                            .setPosition(1);
+                            sleep(150);
+                        })
+                        .lineTo(new Vector2d(36.47,25.00))
+                        .lineToLinearHeading(new Pose2d(36.47, 48.75, Math.toRadians(115.00)))
+                        .lineToLinearHeading(new Pose2d(63.46, 63.06, Math.toRadians(180.00)))*/
+                        .build();
+                drive.setPoseEstimate(untitled1.start());
+                drive.followTrajectorySequence(untitled1);
+                armDown(initialPosition);
+/*
+                RightServo.setPower(1.0);
+                LeftServo.setPower(-1.0);
+                sleep(2500);
+                ArmServo.setPosition(0.75);
+                RightServo.setPower(0.0);
+                LeftServo.setPower(0.0);
+
+                TrajectorySequence untitled1 = drive.trajectorySequenceBuilder(new Pose2d(54.38, 30.00, Math.toRadians(0.00)))
+                        .splineTo(new Vector2d(48.60, 59.15), Math.toRadians(92.94))
+                        .splineToLinearHeading(new Pose2d(70.00, 63.37, Math.toRadians(180.00)), Math.toRadians(67.91))
+                        .build();*/
+                drive.setPoseEstimate(untitled1.start());
+                drive.followTrajectorySequence(untitled1);
+
+                TrajectorySequence seq1 = drive.trajectorySequenceBuilder(startingPose)
+                        //.lineTo(new Vector2d(16,30))
+                        // .lineTo(new Vector2d(16, 25))
+                        .build();
+                drive.followTrajectorySequence(seq1);
 
 
                 break;
@@ -375,28 +473,28 @@ public class BlueBackstageATOM extends LinearOpMode {
     }   // end method telemetryTfod()
 
     private void stopR(){
-        BR.setPower(0.0);
+        RR.setPower(0.0);
         FR.setPower(0.0);
-        BL.setPower(0.0);
+        RL.setPower(0.0);
         FL.setPower(0.0);
     }
     private void stopArm(){
-        ArmMotor.setPower(0.0);
+       slider .setPower(0.0);
     }
     private void armToScore(){
-        ArmMotor.setTargetPosition(ArmMotor.getCurrentPosition() + 600);
-        ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ArmMotor.setPower(1);
+        slider.setTargetPosition(slider.getCurrentPosition() + 600);
+        slider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slider.setPower(1);
     }
 
     private void armDown(int initialPosition){
-        ArmMotor.setTargetPosition(initialPosition);
-        ArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        ArmMotor.setPower(1);
-        while (ArmMotor.isBusy()) {
+        slider.setTargetPosition(initialPosition);
+        slider.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slider.setPower(1);
+        while (slider.isBusy()) {
 
         }
-        ArmMotor.setPower(0.0);
+        slider.setPower(0.0);
     }
     /**
      * Drive Backwards / Forward
@@ -404,19 +502,19 @@ public class BlueBackstageATOM extends LinearOpMode {
     private void drive(double Power, double distance_to_travel, double ticks_per_inch) {
         int ticks_to_destination;
         ticks_to_destination = (int) (distance_to_travel * ticks_per_inch);
-        BL.setTargetPosition(BL.getCurrentPosition() + ticks_to_destination);
+        RL.setTargetPosition(RL.getCurrentPosition() + ticks_to_destination);
         FL.setTargetPosition(FL.getCurrentPosition()+ticks_to_destination);
         FR.setTargetPosition(FR.getCurrentPosition()+ticks_to_destination);
-        BR.setTargetPosition(BR.getCurrentPosition()+ticks_to_destination);
+        RR.setTargetPosition(RR.getCurrentPosition()+ticks_to_destination);
         FR.setPower(Power);
-        BR.setPower(Power);
-        BL.setPower(Power);
+        RR.setPower(Power);
+        RL.setPower(Power);
         FL.setPower(Power);
-        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (BL.isBusy() && BR.isBusy() &&
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (RL.isBusy() && RR.isBusy() &&
                 FL.isBusy() && FR.isBusy()) {
             //telemetry.addData("BL - ", BL.getCurrentPosition() + " - " + BL.getTargetPosition());
             //  telemetry.addData("FL", "%.0i - %.0i", FL.getCurrentPosition(), FL.getTargetPosition());
@@ -428,19 +526,19 @@ public class BlueBackstageATOM extends LinearOpMode {
     private void driveBack(double Power, double distance_to_travel, double ticks_per_inch) {
         int ticks_to_destination;
         ticks_to_destination = (int) (distance_to_travel * ticks_per_inch);
-        BL.setTargetPosition(BL.getCurrentPosition() - ticks_to_destination);
+        RL.setTargetPosition(RL.getCurrentPosition() - ticks_to_destination);
         FL.setTargetPosition(FL.getCurrentPosition()-ticks_to_destination);
         FR.setTargetPosition(FR.getCurrentPosition()-ticks_to_destination);
-        BR.setTargetPosition(BR.getCurrentPosition()-ticks_to_destination);
+        RR.setTargetPosition(RR.getCurrentPosition()-ticks_to_destination);
         FR.setPower(Power);
-        BR.setPower(Power);
-        BL.setPower(Power);
+        RR.setPower(Power);
+        RL.setPower(Power);
         FL.setPower(Power);
-        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (BL.isBusy() && BR.isBusy() &&
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (RL.isBusy() && RR.isBusy() &&
                 FL.isBusy() && FR.isBusy()) {
             //telemetry.addData("BL", "%.0f - %.0f", BL.getCurrentPosition(), BL.getTargetPosition());
             //telemetry.addData("FL", "%.0f - %.0f", FL.getCurrentPosition(), FL.getTargetPosition());
@@ -452,19 +550,19 @@ public class BlueBackstageATOM extends LinearOpMode {
     private void rotateLeft(double Power, double distance_to_travel, double ticks_per_inch) {
         int ticks_to_destination;
         ticks_to_destination = (int) (distance_to_travel * ticks_per_inch);
-        BL.setTargetPosition(BL.getCurrentPosition() - ticks_to_destination);
+        RL.setTargetPosition(RL.getCurrentPosition() - ticks_to_destination);
         FL.setTargetPosition(FL.getCurrentPosition()-ticks_to_destination);
         FR.setTargetPosition(FR.getCurrentPosition()+ticks_to_destination);
-        BR.setTargetPosition(BR.getCurrentPosition()+ticks_to_destination);
+        RR.setTargetPosition(RR.getCurrentPosition()+ticks_to_destination);
         FR.setPower(Power);
-        BR.setPower(Power);
-        BL.setPower(Power);
+        RR.setPower(Power);
+        RL.setPower(Power);
         FL.setPower(Power);
-        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (BL.isBusy() && BR.isBusy() &&
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (RL.isBusy() && RR.isBusy() &&
                 FL.isBusy() && FR.isBusy()) {
 
         }
@@ -472,19 +570,19 @@ public class BlueBackstageATOM extends LinearOpMode {
     private void rotateRight(double Power, double distance_to_travel, double ticks_per_inch) {
         int ticks_to_destination;
         ticks_to_destination = (int) (distance_to_travel * ticks_per_inch);
-        BL.setTargetPosition(BL.getCurrentPosition() + ticks_to_destination);
+        RL.setTargetPosition(RL.getCurrentPosition() + ticks_to_destination);
         FL.setTargetPosition(FL.getCurrentPosition()+ticks_to_destination);
         FR.setTargetPosition(FR.getCurrentPosition()-ticks_to_destination);
-        BR.setTargetPosition(BR.getCurrentPosition()-ticks_to_destination);
+        RR.setTargetPosition(RR.getCurrentPosition()-ticks_to_destination);
         FR.setPower(Power);
-        BR.setPower(Power);
-        BL.setPower(Power);
+        RR.setPower(Power);
+        RL.setPower(Power);
         FL.setPower(Power);
-        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (BL.isBusy() && BR.isBusy() &&
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (RL.isBusy() && RR.isBusy() &&
                 FL.isBusy() && FR.isBusy()) {
 
         }
@@ -495,19 +593,19 @@ public class BlueBackstageATOM extends LinearOpMode {
     private void strafe_left(double Power, double distance_to_travel, double ticks_per_inch) {
         int ticks_to_destination;
         ticks_to_destination = (int) (distance_to_travel * ticks_per_inch);
-        BL.setTargetPosition(BL.getCurrentPosition() + ticks_to_destination);
+        RL.setTargetPosition(RL.getCurrentPosition() + ticks_to_destination);
         FL.setTargetPosition(FL.getCurrentPosition() - ticks_to_destination);
         FR.setTargetPosition(FR.getCurrentPosition() + ticks_to_destination);
-        BR.setTargetPosition(BR.getCurrentPosition() - ticks_to_destination);
+        RR.setTargetPosition(RR.getCurrentPosition() - ticks_to_destination);
         FR.setPower(Power);
-        BR.setPower(Power);
-        BL.setPower(Power);
+        RR.setPower(Power);
+        RL.setPower(Power);
         FL.setPower(Power);
-        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (BL.isBusy() && BR.isBusy() &&
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (RL.isBusy() && RR.isBusy() &&
                 FL.isBusy() && FR.isBusy()) {
 
         }
@@ -515,19 +613,19 @@ public class BlueBackstageATOM extends LinearOpMode {
     private void strafe_right(double Power, double distance_to_travel, double ticks_per_inch) {
         int ticks_to_destination;
         ticks_to_destination = (int) (distance_to_travel * ticks_per_inch);
-        BL.setTargetPosition(BL.getCurrentPosition() - ticks_to_destination);
+        RL.setTargetPosition(RL.getCurrentPosition() - ticks_to_destination);
         FL.setTargetPosition(FL.getCurrentPosition() + ticks_to_destination);
         FR.setTargetPosition(FR.getCurrentPosition() - ticks_to_destination);
-        BR.setTargetPosition(BR.getCurrentPosition() + ticks_to_destination);
+        RR.setTargetPosition(RR.getCurrentPosition() + ticks_to_destination);
         FR.setPower(Power);
-        BR.setPower(Power);
-        BL.setPower(Power);
+        RR.setPower(Power);
+        RL.setPower(Power);
         FL.setPower(Power);
-        BL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        RL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FL.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         FR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        BR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (BL.isBusy() && BR.isBusy() &&
+        RR.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (RL.isBusy() && RR.isBusy() &&
                 FL.isBusy() && FR.isBusy()) {
 
         }
